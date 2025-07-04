@@ -9,7 +9,12 @@ const ProjectSchema = new mongoose.Schema({
     files: [ // we are storing path, on frontend we will files.path.split('/') then we make the folders as well
         {
             path: String,
-            content: String
+            type: { 
+                type: String, 
+                enum: ['File', 'Folder'], 
+                default: 'File' 
+            },
+            content: String,
         }
     ],
     owner : {
