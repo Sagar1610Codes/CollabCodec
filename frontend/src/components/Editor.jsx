@@ -1,16 +1,55 @@
-import React, { useEffect, useRef, useState } from 'react';
+// Editor.jsx
+
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import { Editor } from '@monaco-editor/react';
 import * as Y from 'yjs';
+import useEditorStore from '../store/useEditorStore.js';
+import { useParams } from 'react-router-dom';
 
 const BACKEND_URL = 'http://localhost:3000';
 
-const EditorComponent = ({ projectId, filePath }) => {
-  const roomId = (projectId && filePath) ? `room-${projectId}-${filePath}` : "Temp-room";
+const EditorComponent = () => {
+  const { projectId, '*': filePath } = useParams();
   const ydocRef = useRef(new Y.Doc());
   const ytextRef = useRef(ydocRef.current.getText('monaco'));
 
+  const fileContent = useEditorStore((state) => state.fileContent)
+  const showEditor = useEditorStore((state) => state.showEditor)
+  const loading = useEditorStore((state) => state.loading)
+  const fetchContentFromDB = useEditorStore((state) => state.fetchContentFromDB);
+  const saveContentToDB = useEditorStore((state) => state.saveContentToDB);
+
+
   const [editorValue, setEditorValue] = useState(''); // State to manage Monaco editor value
+
+const roomId = useMemo(() => {
+  return (projectId && filePath)
+    ? `room-${projectId}-${filePath}`
+    : 'Temp-room';
+}, [projectId, filePath]);
+
+
+
+
+  useEffect(() => {
+    console.log("Fetch Content in Editor")
+    fetchContentFromDB(projectId, filePath)
+
+  }, [projectId, filePath, fetchContentFromDB]);
+
+  useEffect(() => {
+    console.log("fileContent changed in Editor :", fileContent)
+    setEditorValue(fileContent)
+
+    // const ytext = ytextRef.current;
+    // ytext.doc.transact(() => {
+    //   ytext.delete(0, ytext.length);
+    //   ytext.insert(0, fileContent);
+    // });
+    // console.log("✅ Yjs seeded with initial file content.");
+  }, [fileContent])
+
 
   useEffect(() => {
     const ydoc = ydocRef.current;
@@ -66,7 +105,7 @@ const EditorComponent = ({ projectId, filePath }) => {
       ydoc.off('update', handleYDocUpdate);
       socket.disconnect();
     };
-  }, []);
+  }, [roomId]);
 
   // Handle Monaco editor content changes
   const handleEditorChange = (value) => {
@@ -79,8 +118,34 @@ const EditorComponent = ({ projectId, filePath }) => {
     });
   };
 
+  const handleSaveKeyDown = (e) => {
+    if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+      e.preventDefault()
+
+      const content = ytextRef.current.toString()
+
+      console.log("filePath in handleSaveKeyDown :", filePath)
+
+      saveContentToDB(projectId, filePath, content)
+    }
+  }
+
+  useEffect(() => {
+    // Add event listener for keydown event
+    window.addEventListener('keydown', handleSaveKeyDown);
+
+    // Cleanup the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('keydown', handleSaveKeyDown);
+    };
+  }, []);
+
+  if (!showEditor || loading) {
+    return <div>Editor Loading...</div>
+  }
+
   return (
-    <div style={{ height: '100vh', width: '100vw' }}>
+    <div className='overflow-hidden'>
       <Editor
         height="100vh"
         language="javascript"

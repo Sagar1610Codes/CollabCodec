@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { User } from "./User.model";
+import { User } from "./User.model.js";
 
 const ProjectSchema = new mongoose.Schema({
     projectName: {
@@ -8,35 +8,41 @@ const ProjectSchema = new mongoose.Schema({
     },
     files: [ // we are storing path, on frontend we will files.path.split('/') then we make the folders as well
         {
-            path: String,
-            type: { 
-                type: String, 
-                enum: ['File', 'Folder'], 
-                default: 'File' 
+            path: {
+                required: true,
+                type: String
             },
-            content: String,
+            type: {
+                type: String,
+                enum: ['file', 'folder'],
+                default: ''
+            },
+            content: {
+                default: 'file',
+                type: String
+            },
         }
     ],
-    owner : {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : User,
-        required : true,
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: User,
+        // required: true,
     },
-    collaborators : [
+    collaborators: [
         {
-            user : {
-                type : mongoose.Schema.Types.ObjectId,
-                ref : User,
+            user: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: User,
             },
-            permission : {
-                type : String,
-                enum : ["read","write"],
-                default : "write",
+            permission: {
+                type: String,
+                enum: ["read", "write"],
+                default: "write",
             }
         }
     ]
-},{
-    timestamps : true
+}, {
+    timestamps: true
 })
 
 export const Project = mongoose.model("Project", ProjectSchema)

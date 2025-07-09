@@ -1,13 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-// import { monaco } from '@bithero/monaco-editor-vite-plugin';
+import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(),
-    // monaco({
-    //   languages : ["javascript"]
-    // }),
+    tailwindcss(),
   ],
   server: {
     host: true, // or use your IP explicitly, like '192.168.0.100'
