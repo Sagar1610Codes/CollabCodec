@@ -38,6 +38,38 @@ const createProject = asyncHandler(async (req, res) => {
         )
 })
 
+const checkProjectId = asyncHandler(async (req, res) => {
+    const projectId = req.params.projectId;
+
+    console.log("projectId in checkProjectId :", projectId)
+
+    if (!projectId) {
+        throw new ApiError(400, "Room Id is requored");
+    }
+
+    let project;
+    try {
+        project = await Project.findById(projectId);
+
+        if (!project) {
+            throw new ApiError(404, "Room not found");
+        }
+    } catch (error) {
+        console.log("Error while joining the room:",error)
+        throw new ApiError(500, "Error while joining the room")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            project
+        )
+    )
+})
+
+
 const fetchFileTree = asyncHandler(async (req, res) => {
     const projectId = req.params.projectId
 
@@ -140,7 +172,11 @@ const fetchFileContent = asyncHandler(async (req, res) => {
     // console.log("req.body in fetchFileContent :",req.body)
     const projectId = req.params.projectId
     const filePath = req.query.filePath
-    console.log("filePath :",filePath)
+    // console.log("filePath :", filePath)
+
+    if( !filePath ){
+        throw new ApiError(400," filePath required")
+    }
 
     let content;
     try {
@@ -156,11 +192,11 @@ const fetchFileContent = asyncHandler(async (req, res) => {
             throw new ApiError(404, "File not found")
         }
 
-        content = file.content 
+        content = file.content
 
-        console.log("Content of file at " , filePath, " :", content)
+        // console.log("Content of file at ", filePath, " :", content)
     } catch (error) {
-        console.log("Error in fetchFileContent :",error)
+        console.log("Error in fetchFileContent :", error)
         throw new ApiError(500, "Error in fetchFileContent ")
     }
 
@@ -259,6 +295,7 @@ const addFile = asyncHandler(async (req, res) => {
 
 export {
     createProject,
+    checkProjectId,
     fetchFileTree,
     saveFileContent,
     fetchFileContent,

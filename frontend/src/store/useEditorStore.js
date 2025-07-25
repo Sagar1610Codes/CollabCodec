@@ -3,7 +3,6 @@ import axiosInstance from "../lib/axios";
 
 const useEditorStore = create((set) => ({
     fileContent: '',
-    showEditor: false,
     loading : false,
 
     saveContentToDB: async (projectId, filePath, content) => {
@@ -22,7 +21,7 @@ const useEditorStore = create((set) => ({
     },
 
     fetchContentFromDB: async (projectId, filePath) => {
-        set({ loading : true, showEditor: false })
+        set({ loading : true })
         try {
             const res = await axiosInstance.get(`/projects/${projectId}/fetchFileContent`, { 
                 params: { filePath } // Send filePath as a query parameter
@@ -36,8 +35,8 @@ const useEditorStore = create((set) => ({
             
         }
         finally {
-            console.log("fileContent changed in Store : ", useEditorStore.getState().fileContent)
-            set({ loading : false, showEditor: true })
+            set({ loading : false })
+            // console.log("fileContent changed in Store : ", useEditorStore.getState().fileContent)
         }
     }
 }))

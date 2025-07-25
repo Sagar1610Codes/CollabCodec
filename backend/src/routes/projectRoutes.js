@@ -1,9 +1,11 @@
 import { Router } from 'express'
-import { addFile, addFolder, createProject, fetchFileContent, fetchFileTree, saveFileContent } from '../controllers/project.controller.js'
+import { addFile, addFolder, checkProjectId, createProject, fetchFileContent, fetchFileTree, saveFileContent } from '../controllers/project.controller.js'
 
 const projectRoutes = Router()
 
 projectRoutes.route("/create").post(createProject)
+
+projectRoutes.route("/:projectId").get(checkProjectId)
 
 projectRoutes.route("/:projectId/fetchFiles").get(fetchFileTree)
 
