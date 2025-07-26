@@ -6,7 +6,7 @@ const docs = new Map();
 const setupSocketIO = (httpServer) => {
   const io = new Server(httpServer, {
     cors: {
-      origin: [process.env.FRONTEND_URL, process.env.IP_FRONTEND_URL],  // local host and network ip both compatible
+      origin: process.env.FRONTEND_URL,  // local host and network ip both compatible
       methods: ['GET', 'POST'],
     },
   });

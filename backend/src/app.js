@@ -10,7 +10,7 @@ dotenv.config({
 const app = express();
 
 app.use(cors({
-    origin: [process.env.FRONTEND_URL, process.env.IP_FRONTEND_URL],  // local host and network ip both compatible
+    origin: process.env.FRONTEND_URL ,  // local host and network ip both compatible
     credentials: true
 }))
 

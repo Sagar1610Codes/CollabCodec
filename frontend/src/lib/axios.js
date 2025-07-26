@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Create an Axios instance
 export const axiosInstance = axios.create({
-  baseURL: import.meta.env.MODE === "development" ? "http://localhost:3000/api" : "/api",
+  baseURL: "https://api-collabcodec.onrender.com/api",
   withCredentials: true,  // Send cookies (e.g., refresh token) with each request
 });
 
